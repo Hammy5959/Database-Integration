@@ -1,8 +1,11 @@
 "use client";
 import React, { useState } from "react";
-
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 function SimpleForm() {
   const [formData, setFormData] = useState({ email: "", password: "" });
+
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -13,7 +16,7 @@ function SimpleForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const data = await fetch("/api/user", {
+      const data = await fetch("/api/signUp", {
         method: "POST",
         body: JSON.stringify(formData),
         cache: "no-store",
@@ -21,10 +24,14 @@ function SimpleForm() {
           "Content-Type": "application/json",
         },
       });
-      if (!formData.email || !formData.password) {
-        alert("input Field requires");
+
+      if (data.ok) {
+        const response = await data.json();
+        toast.success(response.message);
+        router.replace("/");
       } else {
-        alert("New User Added");
+        const response = await data.json();
+        toast.error(response.message);
       }
     } catch (error) {
       console.log("error fetching Data", error);
@@ -78,7 +85,7 @@ function SimpleForm() {
             type="submit"
             className="ml-[120px] bg-black text-white mt-[20px] p-[10px] rounded-2xl"
           >
-            Log in
+            Sign Up
           </button>
         </form>
       </div>
